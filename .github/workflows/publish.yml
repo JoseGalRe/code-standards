@@ -40,8 +40,7 @@ jobs:
         run: |
           pnpm publish \
             --access public \
-            --no-git-checks \
-            --publish-wait-timeout 600000
+            --no-git-checks
         working-directory: packages/eslint-config
     timeout-minutes: 20
 name: Publish
