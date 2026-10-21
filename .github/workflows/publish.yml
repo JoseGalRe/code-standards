@@ -1,0 +1,55 @@
+jobs:
+  publish:
+    name: Publish to npm
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up pnpm and Node.js
+        uses: pnpm/setup@v3
+        with:
+          require-lockfile: true
+
+          runtime: node@24
+          version: 12.15.0
+      - name: Check tag matches package version
+        run: |
+          package_version="$(node -p "require('./packages/eslint-config/package.json').version")"
+          tag_version="${GITHUB_REF_NAME#v}"
+          if [[ "$tag_version" != "$package_version" ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match @josegalre/code-standards-eslint@$package_version"
+            exit 1
+          fi
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Publish to npm
+        run: |
+          pnpm publish \
+            --access public \
+            --no-git-checks \
+            --publish-wait-timeout 600000
+        working-directory: packages/eslint-config
+    timeout-minutes: 20
+name: Publish
+
+on:
+  push:
+    tags:
+      - v*
+
+permissions:
+  contents: read

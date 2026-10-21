@@ -113,6 +113,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "pnpm": ">=12.14.0",
     "node": ">=24.21.0"
