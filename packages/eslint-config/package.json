@@ -1,0 +1,273 @@
+{
+  "name": "@josegalre/code-standards-eslint",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Shared ESLint config for code standards",
+  "author": "Jose Adolfo Galdamez <jose@galre.dev>",
+  "license": "MIT",
+  "repository": {
+    "directory": "packages/eslint-config",
+    "type": "git",
+    "url": "https://github.com/JoseGalRe/code-standards.git"
+  },
+  "keywords": [
+    "eslint",
+    "eslintconfig"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./antfu": {
+      "types": "./dist/configs/antfu.d.ts",
+      "default": "./dist/configs/antfu.js"
+    },
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "default": "./dist/core.js"
+    },
+    "./custom": {
+      "types": "./dist/configs/custom.d.ts",
+      "default": "./dist/configs/custom.js"
+    },
+    "./javascript": {
+      "types": "./dist/configs/javascript.d.ts",
+      "default": "./dist/configs/javascript.js"
+    },
+    "./jsdoc": {
+      "types": "./dist/configs/jsdoc.d.ts",
+      "default": "./dist/configs/jsdoc.js"
+    },
+    "./jsonc": {
+      "types": "./dist/configs/jsonc.d.ts",
+      "default": "./dist/configs/jsonc.js"
+    },
+    "./node": {
+      "types": "./dist/configs/node.d.ts",
+      "default": "./dist/configs/node.js"
+    },
+    "./others": {
+      "types": "./dist/configs/others.d.ts",
+      "default": "./dist/configs/others.js"
+    },
+    "./overrides": {
+      "types": "./dist/configs/overrides.d.ts",
+      "default": "./dist/configs/overrides.js"
+    },
+    "./perfectionist": {
+      "types": "./dist/configs/perfectionist.d.ts",
+      "default": "./dist/configs/perfectionist.js"
+    },
+    "./promise": {
+      "types": "./dist/configs/promise.d.ts",
+      "default": "./dist/configs/promise.js"
+    },
+    "./react": {
+      "types": "./dist/configs/react.d.ts",
+      "default": "./dist/configs/react.js"
+    },
+    "./regexp": {
+      "types": "./dist/configs/regexp.d.ts",
+      "default": "./dist/configs/regexp.js"
+    },
+    "./security": {
+      "types": "./dist/configs/security.d.ts",
+      "default": "./dist/configs/security.js"
+    },
+    "./setup": {
+      "types": "./dist/configs/setup.d.ts",
+      "default": "./dist/configs/setup.js"
+    },
+    "./sonar": {
+      "types": "./dist/configs/sonar.d.ts",
+      "default": "./dist/configs/sonar.js"
+    },
+    "./stylistic": {
+      "types": "./dist/configs/stylistic.d.ts",
+      "default": "./dist/configs/stylistic.js"
+    },
+    "./testing": {
+      "types": "./dist/configs/testing.d.ts",
+      "default": "./dist/configs/testing.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "default": "./dist/types.js"
+    },
+    "./typescript": {
+      "types": "./dist/configs/typescript.d.ts",
+      "default": "./dist/configs/typescript.js"
+    },
+    "./unicorn": {
+      "types": "./dist/configs/unicorn.d.ts",
+      "default": "./dist/configs/unicorn.js"
+    },
+    "./yml": {
+      "types": "./dist/configs/yml.d.ts",
+      "default": "./dist/configs/yml.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "pnpm": ">=12.14.0",
+    "node": ">=24.21.0"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "generate:eslint-types": "node ./scripts/generate-eslint-types.ts",
+    "eslint": "eslint --cache --cache-location ./node_modules/.cache/eslint.json --flag unstable_native_nodejs_ts_config --concurrency auto",
+    "eslint:check": "eslint ./src ./scripts --ext .ts,.tsx,.json --cache --cache-location ./node_modules/.cache/eslint.json --flag unstable_native_nodejs_ts_config --concurrency auto",
+    "eslint:fix": "eslint ./src ./scripts --ext .ts,.tsx,.json --cache --cache-location ./node_modules/.cache/eslint.json --flag unstable_native_nodejs_ts_config --concurrency auto --fix",
+    "prepack": "vp run build",
+    "test": "vp test",
+    "test:watch": "vp test watch",
+    "test:related": "vp test related",
+    "test:coverage": "vp test run --coverage",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "@e18e/eslint-plugin": "^0.8.1",
+    "@eslint-react/eslint-plugin": "^5.28.3",
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@typescript-eslint/eslint-plugin": "^8.72.0",
+    "@typescript-eslint/parser": "^8.72.0",
+    "@vitest/eslint-plugin": "^1.6.27",
+    "eslint": "^10.13.0",
+    "eslint-plugin-antfu": "^3.2.3",
+    "eslint-plugin-de-morgan": "^2.2.1",
+    "eslint-plugin-jsdoc": "^65.4.0",
+    "eslint-plugin-jsonc": "^3.4.2",
+    "eslint-plugin-n": "^18.5.0",
+    "eslint-plugin-perfectionist": "^5.13.0",
+    "eslint-plugin-promise": "^7.3.0",
+    "eslint-plugin-react-doctor": "^0.9.18",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "eslint-plugin-react-you-might-not-need-an-effect": "^1.0.2",
+    "eslint-plugin-regexp": "^3.3.1",
+    "eslint-plugin-security": "^4.2.0",
+    "eslint-plugin-sonarjs": "^4.2.2",
+    "eslint-plugin-testing-library": "^7.16.2",
+    "eslint-plugin-unicorn": "^78.0.0",
+    "eslint-plugin-yml": "^3.9.0",
+    "eslint-plugin-zod": "^5.2.0",
+    "globals": "^17.13.0"
+  },
+  "peerDependenciesMeta": {
+    "@e18e/eslint-plugin": {
+      "optional": true
+    },
+    "@eslint-react/eslint-plugin": {
+      "optional": true
+    },
+    "@eslint/js": {
+      "optional": true
+    },
+    "@stylistic/eslint-plugin": {
+      "optional": true
+    },
+    "@typescript-eslint/eslint-plugin": {
+      "optional": true
+    },
+    "@typescript-eslint/parser": {
+      "optional": true
+    },
+    "@vitest/eslint-plugin": {
+      "optional": true
+    },
+    "eslint-plugin-antfu": {
+      "optional": true
+    },
+    "eslint-plugin-de-morgan": {
+      "optional": true
+    },
+    "eslint-plugin-jsdoc": {
+      "optional": true
+    },
+    "eslint-plugin-jsonc": {
+      "optional": true
+    },
+    "eslint-plugin-n": {
+      "optional": true
+    },
+    "eslint-plugin-perfectionist": {
+      "optional": true
+    },
+    "eslint-plugin-promise": {
+      "optional": true
+    },
+    "eslint-plugin-react-doctor": {
+      "optional": true
+    },
+    "eslint-plugin-react-refresh": {
+      "optional": true
+    },
+    "eslint-plugin-react-you-might-not-need-an-effect": {
+      "optional": true
+    },
+    "eslint-plugin-regexp": {
+      "optional": true
+    },
+    "eslint-plugin-security": {
+      "optional": true
+    },
+    "eslint-plugin-sonarjs": {
+      "optional": true
+    },
+    "eslint-plugin-testing-library": {
+      "optional": true
+    },
+    "eslint-plugin-unicorn": {
+      "optional": true
+    },
+    "eslint-plugin-yml": {
+      "optional": true
+    },
+    "eslint-plugin-zod": {
+      "optional": true
+    },
+    "globals": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@e18e/eslint-plugin": "0.8.1",
+    "@eslint-react/eslint-plugin": "5.28.4",
+    "@eslint/js": "10.0.1",
+    "@stylistic/eslint-plugin": "5.10.0",
+    "@types/node": "catalog:",
+    "@typescript-eslint/eslint-plugin": "8.72.0",
+    "@typescript-eslint/parser": "8.72.0",
+    "@typescript-eslint/utils": "8.72.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "@vitest/coverage-v8": "5.0.5",
+    "@vitest/eslint-plugin": "1.6.27",
+    "eslint": "catalog:",
+    "eslint-plugin-antfu": "3.2.3",
+    "eslint-plugin-de-morgan": "2.2.1",
+    "eslint-plugin-jsdoc": "65.4.0",
+    "eslint-plugin-jsonc": "3.4.2",
+    "eslint-plugin-n": "18.5.0",
+    "eslint-plugin-oxlint": "1.89.0",
+    "eslint-plugin-perfectionist": "5.13.0",
+    "eslint-plugin-promise": "7.3.0",
+    "eslint-plugin-react-doctor": "0.9.18",
+    "eslint-plugin-react-refresh": "0.5.7",
+    "eslint-plugin-react-you-might-not-need-an-effect": "1.0.2",
+    "eslint-plugin-regexp": "3.3.1",
+    "eslint-plugin-security": "4.2.0",
+    "eslint-plugin-sonarjs": "4.2.2",
+    "eslint-plugin-testing-library": "7.16.2",
+    "eslint-plugin-unicorn": "78.0.0",
+    "eslint-plugin-yml": "3.9.0",
+    "eslint-plugin-zod": "5.2.0",
+    "globals": "17.13.0",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "vite-plus/test/globals"]
+  },
+  "exclude": ["dist", "node_modules"]
+}
