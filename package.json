@@ -1,0 +1,33 @@
+{
+  "name": "code-standards",
+  "type": "module",
+  "version": "0.0.1-dev.1",
+  "private": true,
+  "description": "Monorepo for code standards configurations",
+  "author": "Jose Adolfo Galdamez <jose@galre.dev>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JoseGalRe/code-standards.git"
+  },
+  "engines": {
+    "pnpm": ">=12.14.0",
+    "node": ">=24.21.0"
+  },
+  "scripts": {
+    "build": "vp run -r build",
+    "eslint": "vp run -r eslint",
+    "eslint:check": "vp run -r eslint:check",
+    "eslint:fix": "vp run -r eslint:fix",
+    "fmt": "vp fmt",
+    "fmt:check": "vp fmt --check",
+    "test": "vp run -r test",
+    "test:coverage": "vp run -r test:coverage",
+    "typecheck": "vp run -r typecheck"
+  },
+  "devDependencies": {
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

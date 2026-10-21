@@ -1,0 +1,56 @@
+allowBuilds:
+  lefthook: true
+  oxlint: true
+
+autoInstallPeers: true
+
+blockExoticSubdeps: true
+
+catalog:
+  '@types/node': 24.19.1
+  eslint: 10.13.0
+  typescript: 6.0.3
+  vite-plus: 1.3.0
+
+dedupePeers: true
+
+engineStrict: true
+
+# Set a minimum release age (in minutes) for packages to be considesred for installation.
+# This helps avoid installing packages that were just published and may not be fully propagated yet.
+# And also helps to reduce the chain attack target in npm registry.
+minimumReleaseAge: 0
+
+# Keep Vite consumers aligned with the core bundled by catalog.vite-plus.
+overrides:
+  vite@*: npm:@voidzero-dev/vite-plus-core@1.3.0
+
+packages:
+  - packages/*
+
+# The 1.3.0 core embeds Vite 8.3.4, satisfying these exact consumers' Vite 8 ranges.
+# Keep validation strict for all other consumers and toolchain versions.
+# https://github.com/voidzero-dev/vite-plus/issues/2806
+peerDependencyRules:
+  allowedVersions:
+    '@vitejs/plugin-react@6.1.2>vite': 1.3.0
+    '@vitest/mocker@5.0.5>vite': 1.3.0
+    vitest@5.0.5>vite: 1.3.0
+
+saveExact: true
+
+savePrefix: ''
+
+shellEmulator: true
+
+strictPeerDependencies: true
+
+trustLockfile: true
+
+updateConfig:
+  ignoreDependencies:
+    - '@types/node'
+    - node
+    - typescript
+
+verifyDepsBeforeRun: false

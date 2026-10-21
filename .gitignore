@@ -1,0 +1,37 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Directories
+build
+coverage
+dist
+node_modules
+out
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Environment files
+.env
+.env.*
+*.local
+
+# NPM Settings
+.npmrc
+
+# WSL
+*.Identifier
+
+# Cache
+.cache
+
+# NPM cache
+.npm
+
+# TypeScript cache
+*.tsbuildinfo

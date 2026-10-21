@@ -1,0 +1,37 @@
+{
+  "language": "en",
+  "allowCompoundWords": true,
+  "ignorePaths": [
+    "**/.git",
+    "**/build",
+    "**/coverage",
+    "**/dist",
+    "**/node_modules",
+    "**/pnpm-lock.*"
+  ],
+  "files": [
+    "**/*.{ts,tsx,json,yml,md}"
+  ],
+  "dictionaries": [
+    "bash",
+    "companies",
+    "css",
+    "docker",
+    "filetypes",
+    "fonts",
+    "git",
+    "html",
+    "node",
+    "npm",
+    "powershell",
+    "sql",
+    "typescript"
+  ],
+  "words": [
+    "astisho",
+    "galdamez",
+    "josegalre",
+    "msal",
+    "tses"
+  ]
+}

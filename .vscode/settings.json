@@ -1,0 +1,39 @@
+{
+  "eslint.nodeEnv": "development",
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "markdown",
+    "yaml",
+    "html",
+    "json"
+  ],
+  "eslint.options": {
+    "cache": true,
+    "flags": [
+      "unstable_native_nodejs_ts_config"
+    ]
+  },
+  "editor.defaultFormatter": null,
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "explorer.fileNesting.patterns": {
+    "*.js": "$(capture).js, $(capture).md, $(capture).*.js, $(capture)-*.js, $(capture).d.ts, $(capture).*.d.ts",
+    "*.ts": "$(capture).ts, $(capture).md, $(capture).*.ts, $(capture)-*.ts, $(capture)-*.json, $(capture)-*.tsx",
+    "*.tsx": "$(capture).ts, $(capture).md, $(capture).*.ts, $(capture)-*.ts, $(capture).*.tsx, $(capture)-*.tsx, $(capture)-*.json, $(capture)-*.css",
+    "*.mdx": "$(capture).md",
+    ".env": ".env*",
+    ".gitignore": ".gitattributes*, .gitignore*, .git-blame-ignore",
+    "readme.mdx": "README.md, AGENTS.md",
+    "azure-pipelines.yml": "azure-pipelines*, depcheck.yml, .depcheck, GitVersion.yml, nginx.conf, *-junit.xml, *-sonar.xml, dependency-check-*",
+    "Dockerfile": "Dockerfile*, .dockerignore*, docker-compose.yml",
+    "package.json": ".browserslist*, .editorconfig*, .gitignore, .eslint*, eslint*, oxfmt*, oxlint*, cspell.json, lefthook.json, opencode.json, package*.json, tsconfig.*, pnpm*, .pnpm*, .npm*",
+    "README.md": "AGENTS.md",
+    "vite.config.ts": "vitest.config.ts, index.html"
+  },
+  "prettier.enable": false,
+}
