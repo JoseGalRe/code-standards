@@ -12,7 +12,7 @@ import type { EslintConfig } from './types.ts';
  *
  * @returns An array of ESLint configurations.
  */
-export function eslintConfig(...config: (EslintConfig | EslintConfig[])[]) {
+export function eslintConfig(...config: (EslintConfig | EslintConfig[])[]): EslintConfig[] {
   return defineConfig(...config);
 }
 
