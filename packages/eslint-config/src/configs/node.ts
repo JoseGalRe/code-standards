@@ -32,7 +32,6 @@ export function node() {
        */
       'n/no-extraneous-import': ['off'],
       'n/no-missing-import': ['error', {
-        allowModules: ['fpm-database-entities-sdk', 'smart-suite-backend-utilities-sdk'],
         ignoreTypeImport: true,
         resolverConfig: {
           extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
