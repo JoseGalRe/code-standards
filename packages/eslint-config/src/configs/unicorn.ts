@@ -146,6 +146,12 @@ export function unicorn() {
        */
       'unicorn/prefer-regexp-test': ['off'],
       /**
+       * Disable type alias checks because they are not relevant to this codebase's style and patterns.
+       */
+      'unicorn/prefer-smaller-scope': ['error', {
+        checkTypeAliases: false,
+      }],
+      /**
        * Allow `atob()` and `btoa()` when they provide the simplest integration
        * with existing APIs or string-based Base64 workflows.
        */
