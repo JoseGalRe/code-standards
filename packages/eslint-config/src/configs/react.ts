@@ -3,37 +3,439 @@ import doctor from 'eslint-plugin-react-doctor';
 import refresh from 'eslint-plugin-react-refresh';
 import youMightNotNeedAnEffect from 'eslint-plugin-react-you-might-not-need-an-effect';
 
+import { resolveRuleGroups } from '../utils/rule-groups/index.ts';
+
 import type { EslintConfig } from '../types.ts';
-import type { ESLint, Linter } from 'eslint';
+import type { RuleGroup, RuleGroupFlags } from '../utils/rule-groups/rule-groups-types.ts';
+import type { Linter } from 'eslint';
 
 /**
- * Rule-group prefixes for libraries not used in this project (Jotai, MobX, remotion, three.js, etc).
+ * Optional rule groups of the `react` layer.
  *
- * Disabling by prefix avoids react-doctor flagging every rule under a group whose entire premise doesn't apply here.
+ * Library groups only matter when the project uses that library, so they are
+ * disabled by default. Feature groups describe the runtime the project targets.
+ */
+export type ReactConfigInclude = {
+  /**
+   * `react-doctor` Base UI rules.
+   *
+   * @default false
+   */
+  baseUI?: boolean;
+  /**
+   * React Compiler support: lets `@eslint-react` skip rules made redundant by the
+   * compiler (`compilationMode: 'infer'`).
+   *
+   * @default false
+   */
+  compiler?: boolean;
+  /**
+   * `react-doctor` Ink (terminal UI) rules.
+   *
+   * @default false
+   */
+  ink?: boolean;
+  /**
+   * `react-doctor` Jotai rules.
+   *
+   * @default false
+   */
+  jotai?: boolean;
+  /**
+   * Rule that flags full `lodash` imports.
+   *
+   * @default false
+   */
+  lodash?: boolean;
+  /**
+   * `react-doctor` MobX rules.
+   *
+   * @default false
+   */
+  mobx?: boolean;
+  /**
+   * Rule that flags `moment` usage.
+   *
+   * @default false
+   */
+  moment?: boolean;
+  /**
+   * `react-doctor` Motion (Framer Motion) rules.
+   *
+   * @default false
+   */
+  motion?: boolean;
+  /**
+   * `react-doctor` Preact preset.
+   *
+   * @default false
+   */
+  preact?: boolean;
+  /**
+   * `react-doctor` React Three Fiber rules.
+   *
+   * @default false
+   */
+  r3f?: boolean;
+  /**
+   * `react-doctor` Radix UI rules.
+   *
+   * @default false
+   */
+  radix?: boolean;
+  /**
+   * React 19 rules. When disabled, React 19-only APIs and migrations are not
+   * suggested; when enabled, React 18 ref-cleanup warnings are dropped.
+   *
+   * @default false
+   */
+  react19?: boolean;
+  /**
+   * `react-doctor` React Aria rules.
+   *
+   * @default false
+   */
+  reactAria?: boolean;
+  /**
+   * `react-doctor` react-markdown rules.
+   *
+   * @default false
+   */
+  reactMarkdown?: boolean;
+  /**
+   * `react-doctor` React Native and Expo preset.
+   *
+   * @default false
+   */
+  reactNative?: boolean;
+  /**
+   * `react-doctor` React Router rules (routing, loaders, navigation, search params).
+   * Framework-mode server rules also require {@link ReactConfigInclude.ssr}.
+   *
+   * @default false, or `true` when `reactRouterV8` is enabled
+   */
+  reactRouter?: boolean;
+  /**
+   * `react-doctor` React Router v8 rules (removed imports, future flags, and meta fields).
+   * Implies {@link ReactConfigInclude.reactRouter} unless it is explicitly `false`.
+   *
+   * @default false
+   */
+  reactRouterV8?: boolean;
+  /**
+   * `react-doctor` Redux rules.
+   *
+   * @default false
+   */
+  redux?: boolean;
+  /**
+   * `eslint-plugin-react-refresh` rules for Vite HMR.
+   *
+   * @default true
+   */
+  refresh?: boolean;
+  /**
+   * `react-doctor` Remotion rules.
+   *
+   * @default false
+   */
+  remotion?: boolean;
+  /**
+   * React Server Components and Server Functions rules.
+   *
+   * @default false
+   */
+  server?: boolean;
+  /**
+   * `react-doctor` shadcn/ui rules.
+   *
+   * @default false
+   */
+  shadcn?: boolean;
+  /**
+   * Server rendering and hydration rules, including React Router framework-mode
+   * middleware and session rules when {@link ReactConfigInclude.reactRouter} is enabled.
+   *
+   * @default false
+   */
+  ssr?: boolean;
+  /**
+   * `react-doctor` styled-components rules.
+   *
+   * @default false
+   */
+  styledComponents?: boolean;
+  /**
+   * `react-doctor` TanStack Form preset.
+   *
+   * @default false
+   */
+  tanstackForm?: boolean;
+  /**
+   * `react-doctor` TanStack Query preset.
+   *
+   * @default false
+   */
+  tanstackQuery?: boolean;
+  /**
+   * `react-doctor` TanStack Start preset.
+   *
+   * @default false
+   */
+  tanstackStart?: boolean;
+  /**
+   * `react-doctor` TanStack Table preset.
+   *
+   * @default false
+   */
+  tanstackTable?: boolean;
+  /**
+   * `react-doctor` TanStack Virtual preset.
+   *
+   * @default false
+   */
+  tanstackVirtual?: boolean;
+  /**
+   * `react-doctor` three.js rules.
+   *
+   * @default false
+   */
+  three?: boolean;
+  /**
+   * `react-doctor` Valtio rules.
+   *
+   * @default false
+   */
+  valtio?: boolean;
+  /**
+   * `react-doctor` WebGL rules.
+   *
+   * @default false
+   */
+  webgl?: boolean;
+  /**
+   * `eslint-plugin-react-you-might-not-need-an-effect` rules. When disabled, the
+   * equivalent `react-doctor` rules are used instead.
+   *
+   * @default true
+   */
+  youMightNotNeedAnEffect?: boolean;
+  /**
+   * `react-doctor` Zod rules. Off by default because `eslint-plugin-zod` is more comprehensive.
+   *
+   * @default false
+   */
+  zod?: boolean;
+  /**
+   * `react-doctor` Zustand rules.
+   *
+   * @default false
+   */
+  zustand?: boolean;
+};
+
+export type ReactConfig = {
+  include?: ReactConfigInclude;
+};
+
+type RuleGroupName = Exclude<keyof ReactConfigInclude, 'refresh' | 'youMightNotNeedAnEffect'>;
+
+/**
+ * Optional rule groups.
+ *
+ * Library groups are disabled by prefix so react-doctor does not flag code under a premise
+ * that does not apply to the project.
  *
  * @see {@link https://www.react.doctor/docs/rules} for the full rule catalog by group.
  */
-const reactDoctorUnusedGroups = [
-  'react-doctor/base-ui',
-  'react-doctor/ink',
-  'react-doctor/jotai',
-  'react-doctor/mobx',
-  'react-doctor/motion',
-  'react-doctor/r3f',
-  'react-doctor/radix',
-  'react-doctor/react-aria',
-  'react-doctor/react-markdown',
-  'react-doctor/react-router-v8', // this project uses react-router v7 due to React 18, thus we don't need the v8 rules
-  'react-doctor/redux',
-  'react-doctor/remotion',
-  'react-doctor/server',
-  'react-doctor/shadcn',
-  'react-doctor/styled-components',
-  'react-doctor/three',
-  'react-doctor/val',
-  'react-doctor/webgl',
-  'react-doctor/zod', // zod has a more comprehensive plugin, thus we don't need react-doctor's zod rules
-];
+const ruleGroups = {
+  baseUI: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/base-ui-'],
+  },
+  /**
+   * Only affects `settings['react-x'].compilationMode`. `react-doctor/react-compiler-no-manual-memoization`
+   * is retired upstream (its `create` is a no-op), so it is not toggled here.
+   */
+  compiler: {
+    defaultEnabled: false,
+  },
+  ink: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/ink-'],
+  },
+  jotai: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/jotai-'],
+  },
+  lodash: {
+    defaultEnabled: false,
+    whenDisabled: {
+      'react-doctor/no-full-lodash-import': ['off'],
+    },
+  },
+  mobx: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/mobx-'],
+  },
+  moment: {
+    defaultEnabled: false,
+    whenDisabled: {
+      'react-doctor/no-moment': ['off'],
+    },
+  },
+  motion: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/motion-'],
+    whenDisabled: {
+      'react-doctor/no-conflicting-spring-options': ['off'],
+      'react-doctor/no-static-motion-config-never': ['off'],
+      'react-doctor/use-lazy-motion': ['off'],
+    },
+  },
+  preact: {
+    defaultEnabled: false,
+    whenEnabled: doctor?.configs?.preact?.rules,
+  },
+  r3f: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/r3f-'],
+  },
+  radix: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/radix-'],
+  },
+  react19: {
+    defaultEnabled: false,
+    whenDisabled: {
+      '@eslint-react/dom-no-use-form-state': ['off'],
+      '@eslint-react/no-context-provider': ['off'],
+      '@eslint-react/no-forward-ref': ['off'],
+      '@eslint-react/no-use-context': ['off'],
+      'react-doctor/no-default-props': ['off'],
+      'react-doctor/no-react19-deprecated-apis': ['off'],
+      'react-doctor/prefer-use-effect-event': ['off'],
+    },
+    whenEnabled: {
+      /**
+       * Ref callback cleanup is supported natively since React 19.
+       */
+      'react-doctor/no-ref-callback-cleanup-before-react-19': ['off'],
+    },
+  },
+  reactAria: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/react-aria-'],
+  },
+  reactMarkdown: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/react-markdown-'],
+  },
+  reactNative: {
+    defaultEnabled: false,
+    whenEnabled: doctor?.configs?.['react-native']?.rules,
+  },
+  /**
+   * Covers every `react-router-*` rule, so v8 and framework-mode server rules are also off when disabled.
+   */
+  reactRouter: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/react-router-'],
+  },
+  reactRouterV8: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/react-router-v8-'],
+  },
+  redux: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/redux-'],
+  },
+  remotion: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/remotion-'],
+  },
+  server: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/server-'],
+    whenDisabled: {
+      '@eslint-react/rsc-function-definition': ['off'],
+    },
+  },
+  shadcn: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/shadcn-'],
+  },
+  ssr: {
+    defaultEnabled: false,
+    whenDisabled: {
+      'react-doctor/no-hydration-branch-on-browser-global': ['off'],
+      'react-doctor/no-impure-call-at-module-scope': ['off'],
+      'react-doctor/no-locale-format-in-render': ['off'],
+      'react-doctor/no-match-media-in-state-initializer': ['off'],
+      'react-doctor/no-unguarded-browser-global-at-module-scope': ['off'],
+      'react-doctor/no-unguarded-browser-global-in-render-or-hook-init': ['off'],
+      'react-doctor/react-router-csp-nonce-consistency': ['off'],
+      'react-doctor/react-router-guard-aborted-handle-error': ['off'],
+      'react-doctor/react-router-no-catch-middleware-next': ['off'],
+      'react-doctor/react-router-no-client-module-in-server-render': ['off'],
+      'react-doctor/react-router-no-middleware-response-body-consumption': ['off'],
+      'react-doctor/react-router-no-multiple-middleware-next': ['off'],
+      'react-doctor/react-router-no-route-module-environment-suffix': ['off'],
+      'react-doctor/react-router-no-session-mutation-in-loader': ['off'],
+      'react-doctor/react-router-no-static-cookie-expires': ['off'],
+      'react-doctor/react-router-server-middleware-return-response': ['off'],
+      'react-doctor/react-router-session-mutation-requires-commit': ['off'],
+      'react-doctor/rendering-hydration-mismatch-time': ['off'],
+    },
+    whenEnabled: {
+      'react-doctor/no-impure-call-at-module-scope': ['warn'],
+    },
+  },
+  styledComponents: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/styled-components-'],
+  },
+  tanstackForm: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/tanstack-form-'],
+  },
+  tanstackQuery: {
+    defaultEnabled: false,
+    whenEnabled: doctor?.configs?.['tanstack-query']?.rules,
+  },
+  tanstackStart: {
+    defaultEnabled: false,
+    whenEnabled: doctor?.configs?.['tanstack-start']?.rules,
+  },
+  tanstackTable: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/tanstack-table-'],
+  },
+  tanstackVirtual: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/tanstack-virtual-'],
+  },
+  three: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/three-'],
+  },
+  valtio: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/valtio-'],
+  },
+  webgl: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/webgl-'],
+  },
+  zod: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/zod-'],
+  },
+  zustand: {
+    defaultEnabled: false,
+    prefixes: ['react-doctor/zustand-'],
+  },
+} as const satisfies Record<RuleGroupName, RuleGroup>;
 
 /**
  * Disabled rules that are duplicated by other ESLint plugins.
@@ -69,45 +471,28 @@ const reactDoctorDisabledDuplicatedRules: Linter.RulesConfig = {
    */
   'react-doctor/jsx-no-undef': ['off'],
   'react-doctor/jsx-props-no-spread-multi': ['off'],
-  /**
-   * Disable rules that are cloned from eslint-plugin-react-you-might-not-need-an-effect
-   */
-  'react-doctor/no-adjust-state-on-prop-change': ['off'],
   'react-doctor/no-array-index-as-key': ['off'],
   'react-doctor/no-async-effect-callback': ['off'],
-  'react-doctor/no-chain-state-updates': ['off'],
-  'react-doctor/no-children-prop': ['off'],
   'react-doctor/no-create-ref-in-function-component': ['off'],
   'react-doctor/no-danger-with-children': ['off'],
   'react-doctor/no-deprecated-keyboard-event-keycode-which': ['off'],
-  'react-doctor/no-derived-state': ['off'],
   'react-doctor/no-did-mount-set-state': ['off'],
   'react-doctor/no-did-update-set-state': ['off'],
   'react-doctor/no-direct-mutation-state': ['off'],
   'react-doctor/no-eager-new-in-use-state-initializer': ['off'],
   'react-doctor/no-eval': ['off'],
-
-  'react-doctor/no-event-handler': ['off'],
   'react-doctor/no-find-dom-node': ['off'],
   'react-doctor/no-flush-sync': ['off'],
-  'react-doctor/no-initialize-state': ['off'],
   'react-doctor/no-is-mounted': ['off'],
   'react-doctor/no-json-parse-stringify-clone': ['off'],
   'react-doctor/no-legacy-class-lifecycles': ['off'],
   'react-doctor/no-mutable-in-deps': ['off'],
-
   'react-doctor/no-namespace': ['off'],
   'react-doctor/no-nested-component-definition': ['off'],
-  'react-doctor/no-pass-data-to-parent': ['off'],
-  'react-doctor/no-pass-live-state-to-parent': ['off'],
   'react-doctor/no-render-return-value': ['off'],
-  'react-doctor/no-reset-all-state-on-prop-change': ['off'],
-
   'react-doctor/no-set-state-in-render': ['off'],
-
   'react-doctor/no-string-refs': ['off'],
   'react-doctor/no-this-in-sfc': ['off'],
-
   'react-doctor/no-transition-all': ['off'],
   'react-doctor/no-unknown-property': ['off'],
   'react-doctor/no-unsafe': ['off'],
@@ -125,87 +510,33 @@ const reactDoctorDisabledDuplicatedRules: Linter.RulesConfig = {
 };
 
 /**
- * Disabled rules that are not applicable to this project
+ * `react-doctor` clones of `eslint-plugin-react-you-might-not-need-an-effect` rules.
+ *
+ * Disabled only while that plugin is enabled, so the checks keep running when it is not.
  */
-const reactDoctorNoApplicableRules: Linter.RulesConfig = {
-  /**
-   * Disable specific React 19 rules
-   */
-  'react-doctor/activity-wraps-effect-heavy-subtree': ['off'],
+const reactDoctorYouMightNotNeedAnEffectRules: Linter.RulesConfig = {
+  'react-doctor/no-adjust-state-on-prop-change': ['off'],
   'react-doctor/no-chain-state-updates': ['off'],
-  /**
-   * Disable specific motion rules
-   */
-  'react-doctor/no-conflicting-spring-options': ['off'],
-  'react-doctor/no-default-props': ['off'],
-  /**
-   * Disable lodash and moment rules since they are not used in this project
-   */
-  'react-doctor/no-full-lodash-import': ['off'],
-  /**
-   * Disable specific SSR rules
-   *
-   * These rules are not applicable to SPA
-   */
-  'react-doctor/no-hydration-branch-on-browser-global': ['off'],
-
-  'react-doctor/no-impure-call-at-module-scope': ['off'],
-  'react-doctor/no-locale-format-in-render': ['off'],
-  'react-doctor/no-match-media-in-state-initializer': ['off'],
-  'react-doctor/no-moment': ['off'],
-  'react-doctor/no-react19-deprecated-apis': ['off'],
-  'react-doctor/no-static-motion-config-never': ['off'],
-  'react-doctor/no-unguarded-browser-global-at-module-scope': ['off'],
-  'react-doctor/no-unguarded-browser-global-in-render-or-hook-init': ['off'],
-  'react-doctor/prefer-use-effect-event': ['off'],
-  'react-doctor/react-compiler-no-manual-memoization': ['off'],
-  /**
-   * Disable specific React Router SSR rules
-   *
-   * These rules are not applicable
-   */
-  'react-doctor/react-router-csp-nonce-consistency': ['off'],
-
-  'react-doctor/react-router-guard-aborted-handle-error': ['off'],
-  'react-doctor/react-router-no-catch-middleware-next': ['off'],
-  'react-doctor/react-router-no-client-module-in-server-render': ['off'],
-  'react-doctor/react-router-no-middleware-response-body-consumption': ['off'],
-  'react-doctor/react-router-no-multiple-middleware-next': ['off'],
-  'react-doctor/react-router-no-route-module-environment-suffix': ['off'],
-  'react-doctor/react-router-no-session-mutation-in-loader': ['off'],
-
-  'react-doctor/react-router-no-static-cookie-expires': ['off'],
-  'react-doctor/react-router-server-middleware-return-response': ['off'],
-  'react-doctor/react-router-session-mutation-requires-commit': ['off'],
-
-  'react-doctor/rendering-hydration-mismatch-time': ['off'],
-  'react-doctor/use-lazy-motion': ['off'],
+  'react-doctor/no-derived-state': ['off'],
+  'react-doctor/no-event-handler': ['off'],
+  'react-doctor/no-initialize-state': ['off'],
+  'react-doctor/no-pass-data-to-parent': ['off'],
+  'react-doctor/no-pass-live-state-to-parent': ['off'],
+  'react-doctor/no-reset-all-state-on-prop-change': ['off'],
 };
 
 /**
- * Disabled rules that are not applicable to this project
+ * Normalizes consumer flags before resolving {@link ruleGroups}.
  *
- * These rules are designed for React 19, but this project is using React 18, so we disable them for now.
+ * @param include - Flags provided by the consumer.
+ *
+ * @returns Flags where `reactRouterV8` implies `reactRouter` unless it is explicitly set.
  */
-const eslintReactNoApplicableRules: Linter.RulesConfig = {
-  '@eslint-react/dom-no-use-form-state': ['off'],
-  '@eslint-react/no-context-provider': ['off'],
-  '@eslint-react/no-forward-ref': ['off'],
-  '@eslint-react/no-use-context': ['off'],
-  '@eslint-react/rsc-function-definition': ['off'],
-};
-
-function disabledReactDoctorUnusedGroups(rules: Linter.RulesConfig): Linter.RulesConfig {
-  const ruleKeys = Object.keys(rules || {});
-  const disabledRules: Record<string, Linter.RuleEntry> = {};
-
-  for (const rule of ruleKeys) {
-    if (reactDoctorUnusedGroups.some((group) => rule.startsWith(group))) {
-      disabledRules[rule] = ['off'];
-    }
-  }
-
-  return disabledRules;
+function toRuleGroupFlags(include: ReactConfigInclude): RuleGroupFlags {
+  return {
+    ...include,
+    reactRouter: include.reactRouter ?? include.reactRouterV8,
+  };
 }
 
 /**
@@ -213,15 +544,26 @@ function disabledReactDoctorUnusedGroups(rules: Linter.RulesConfig): Linter.Rule
  *
  * Combines the `@eslint-react`, React refresh, React Doctor, and
  * `react-you-might-not-need-an-effect` recommended rules, then disables
- * duplicated, React 19, and SSR rules that do not apply to this React 18 SPA.
+ * duplicated rules and every optional group not enabled through `include`.
+ * Defaults target a React 18 client-rendered SPA built with Vite.
+ *
+ * @param props - Optional configuration for the React ESLint rules.
  *
  * @returns The ESLint configuration for React rules.
  */
-export function react() {
+export function react(props: ReactConfig = {}) {
+  const include = props.include ?? {};
+
+  const isRefreshEnabled = include.refresh ?? true;
+  const isYouMightNotNeedAnEffectEnabled = include.youMightNotNeedAnEffect ?? true;
+
   const recommendedTypescript = plugin?.configs?.['recommended-typescript'] || {};
-  const recommendedRefresh = refresh?.configs?.vite || {};
-  const recommendedYouMightNotNeedAnEffect = youMightNotNeedAnEffect?.configs?.recommended || {};
+  const recommendedRefresh = isRefreshEnabled ? refresh?.configs?.vite : undefined;
   const recommendedDoctor = doctor?.configs?.recommended || {};
+
+  const recommendedYouMightNotNeedAnEffect = isYouMightNotNeedAnEffectEnabled
+    ? youMightNotNeedAnEffect?.configs?.recommended
+    : undefined;
 
   return {
     files: ['**/*.{ts,tsx}'],
@@ -231,16 +573,15 @@ export function react() {
       ...recommendedRefresh?.plugins,
       ...recommendedYouMightNotNeedAnEffect?.plugins,
       ...recommendedDoctor?.plugins,
-    } as ESLint.Plugin,
+    },
     rules: {
       ...recommendedTypescript?.rules,
       ...recommendedRefresh?.rules,
       ...recommendedYouMightNotNeedAnEffect?.rules,
       ...recommendedDoctor?.rules,
       ...reactDoctorDisabledDuplicatedRules,
-      ...reactDoctorNoApplicableRules,
-      ...eslintReactNoApplicableRules,
-      ...disabledReactDoctorUnusedGroups(recommendedDoctor?.rules),
+      ...(isYouMightNotNeedAnEffectEnabled && reactDoctorYouMightNotNeedAnEffectRules),
+      ...resolveRuleGroups(ruleGroups, toRuleGroupFlags(include), recommendedDoctor?.rules ?? {}),
       '@eslint-react/dom-no-missing-button-type': ['error'],
       '@eslint-react/dom-no-missing-iframe-sandbox': ['error'],
       '@eslint-react/dom-no-string-style-prop': ['error'],
@@ -252,12 +593,26 @@ export function react() {
        * so this rule is redundant and unnecessary
        */
       'react-doctor/circular-dependency': ['off'],
-    } as Linter.Config['rules'],
+      /**
+       * Opt-in upstream. Complements `@eslint-react/set-state-in-effect`, which misses a state setter
+       * passed as an argument to a helper called synchronously inside an effect (e.g. `apply(setCount, value)`).
+       */
+      'react-doctor/forwarded-set-state-in-effect': ['warn'],
+    },
     settings: {
-      react: {
+      /**
+       * `react-doctor` presets set `portedRuleMode: 'curated'`, which makes rules ported from other
+       * plugins (`alt-text`, `anchor-is-valid`, `jsx-key`, etc.) skip noisy contexts.
+       */
+      ...recommendedDoctor?.settings,
+      'react': {
         pragma: 'React',
         version: 'detect',
       },
-    } as Linter.Config['settings'],
+      'react-x': {
+        version: 'detect',
+        ...(include.compiler && { compilationMode: 'infer' }),
+      },
+    },
   } as EslintConfig;
 }
