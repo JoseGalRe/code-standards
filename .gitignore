@@ -35,3 +35,6 @@ out
 
 # TypeScript cache
 *.tsbuildinfo
+
+# Vitest
+.vitest
