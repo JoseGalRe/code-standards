@@ -649,8 +649,7 @@ describe('utils: json-schema-to-type', () => {
         jsonSchemaToType({
           $ref: '#/definitions/a/missing',
           definitions: { a: { type: 'object' } },
-        }),
-      ).toThrow('Reference not found');
+        })).toThrow('Reference not found');
     });
 
     it('should throw on ref not found without fallback', () => {
@@ -658,8 +657,7 @@ describe('utils: json-schema-to-type', () => {
         jsonSchemaToType({
           $ref: '#/something/abc',
           something: {},
-        }),
-      ).toThrow('Reference not found');
+        })).toThrow('Reference not found');
     });
 
     it('should throw on ref through non-object', () => {
@@ -667,8 +665,7 @@ describe('utils: json-schema-to-type', () => {
         jsonSchemaToType({
           $ref: '#/a/b',
           a: 'not an object',
-        }),
-      ).toThrow('Reference not found');
+        })).toThrow('Reference not found');
     });
   });
 
