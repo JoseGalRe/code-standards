@@ -19,6 +19,7 @@
     "eslint": "vp run -r eslint",
     "eslint:check": "vp run -r eslint:check",
     "eslint:fix": "vp run -r eslint:fix",
+    "inspect:eslint": "pnpm dlx @eslint/config-inspector",
     "fmt": "vp fmt",
     "fmt:check": "vp fmt --check",
     "test": "vp run -r test",
